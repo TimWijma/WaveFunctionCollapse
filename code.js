@@ -1,39 +1,81 @@
 class Grid {
-    constructor(x,y) {
-        this.x = x
-        this.y = y
+    constructor(rows, columns) {
+        this.rows = rows
+        this.columns = columns
         this.grid = []
-        
+        this.values = {
+            0: { //land
+                0: [0],
+                1: [0,1],
+                2: [0,1],
+                3: [0,1]
+            },
+            1: { //coast
+                0: [0],
+                1: [0,1,2],
+                2: [2],
+                3: [0,1,2]
+            },
+            2: { //sea
+                0: [1,2],
+                1: [1,2],
+                2: [2],
+                3: [1,2]
+            }
+        }
 
-        for(let i = x; i > 0; i--) {
+        for(let i = 0; i < rows; i++) {
             let row = []
-            for(let j = y; j > 0; j--) {
-                let value = 0
-                let cell = new Cell(i, j, value)
+            for(let j = 0; j < columns; j++) {
+                let value = null
+                let cell = new Cell(this, j, i, value)
                 row.push(cell)
             }
             this.grid.push(row)
         }
+        for(const row of this.grid) {
+            for(const cell of row) {
+                cell.getNeighbours()
+            }
+        }
     }
     log() {
         let tempGrid = []
-        for(let i = this.x; i > 0; i--) {
-            let row = []
-            for(let j = this.y; j > 0; j--) {
-                let cell = this.grid[this.y - 1][this.x - 1]
-                row.push(cell.value)
+        for(const row of this.grid) {
+            let tempRow = []
+            for(const cell of row) {
+                tempRow.push(cell.value)
             }
-            tempGrid.push(row)
+            tempGrid.push(tempRow)
         }
         console.log(tempGrid)
     }
 }
 
 class Cell {
-    constructor(x, y, value) {
+    constructor(parent, x, y, value) {
+        this.parent = parent
         this.x = x
         this.y = y
         this.value = value
+        this.neighbours = []
+    }
+    getNeighbours() {
+        if(this.y > 0 && this.parent.grid[this.y - 1][this.x]) {
+            this.neighbours.push({0: this.parent.grid[this.y - 1][this.x]})
+        }
+        if(this.parent.grid[this.y][this.x + 1]) {
+            this.neighbours.push({1: this.parent.grid[this.y][this.x + 1]})
+        }
+        if(this.y < this.parent.rows - 1 && this.parent.grid[this.y + 1][this.x]) {
+            this.neighbours.push({2: this.parent.grid[this.y + 1][this.x]})
+        }
+        if(this.parent.grid[this.y][this.x - 1]) {
+            this.neighbours.push({3: this.parent.grid[this.y][this.x - 1]})
+        }
+    }
+    getNeighbourValues() {
+
     }
     getPossibleValues() {
 
